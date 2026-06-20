@@ -24,17 +24,22 @@ def deploy_scrcpy_server() -> tuple[subprocess.Popen, socket.socket] | Exception
 def deploy_reporter_server() -> Exception | None:
     primary_device = get_adb_device()
     if isinstance(primary_device, Exception): return primary_device
-    primary_device.forward(f"tcp:{reporter_receiver.SERVER_PORT}", f"tcp:{reporter_receiver.SERVER_PORT}")
+    try:
+        for f in primary_device.forward_list():
+            if f.remote in ("tcp:61625", "localabstract:inputsharereporter"):
+                primary_device.forward_remove(f.local)
+    except: pass
+    primary_device.forward(f"tcp:{reporter_receiver.SERVER_PORT}", "localabstract:inputsharereporter")
 
     package_path    = primary_device.shell("pm path " + reporter_receiver.PACKAGE_NAME)
     package_version = primary_device.shell(f"dumpsys package {reporter_receiver.PACKAGE_NAME} | grep versionName")
     assert type(package_path) == str and type(package_version) == str
-    parsed_version = package_version.split("=")[1] if package_version else ""
+    parsed_version = package_version.split("=")[1].strip() if package_version else ""
     not_installed  = len(package_path) == 0
     is_outdated    = parsed_version != reporter_receiver.PACKAGE_VERSION
     if not_installed or is_outdated:
         if not_installed: LOGGER.write(LogType.Server, "Reporter not installed, installing...")
-        elif is_outdated: LOGGER.write(LogType.Server, "Reporter outdated, updating...")
+        elif is_outdated: LOGGER.write(LogType.Server, f"Reporter outdated (device has '{parsed_version}', PC wants '{reporter_receiver.PACKAGE_VERSION}'), updating...")
         if (res := reporter_receiver.install_server(primary_device)) is not None:
             return res
 

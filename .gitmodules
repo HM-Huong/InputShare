@@ -1,0 +1,3 @@
+[submodule "InputShare-android"]
+	path = InputShare-android
+	url = git@github.com:HM-Huong/InputShare-android.git

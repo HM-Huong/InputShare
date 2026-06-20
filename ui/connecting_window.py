@@ -156,7 +156,7 @@ def mount_connecting_view(tabview: ctk.CTkTabview) -> ctk.CTkEntry:
             enable_widgets()
         elif type(result) == ProcessOk:
             get_config().scan_port = bool(auto_scan_port.get())
-            get_config().device_ip1 = get_ip_from_ip_port(result.ip_port_str)
+            get_config().device_ip1 = result.ip_port_str
             connecting_window.destroy()
         else: unreachable("Connection result: " + str(result))
 

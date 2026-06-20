@@ -15,7 +15,7 @@ __adb_client_instance: adbutils.AdbClient | None = None
 __adb_device_list: list[adbutils.AdbDevice] = []
 os.environ["ADBUTILS_ADB_PATH"] = str(adb_bin_path)
 ADB_BIN_PATH = str(adb_bin_path)
-ADB_SERVER_PORT = 5038
+ADB_SERVER_PORT = 5037
 
 class ADBWiredConnectionError(Exception): pass
 
